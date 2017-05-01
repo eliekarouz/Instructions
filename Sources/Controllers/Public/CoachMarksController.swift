@@ -36,7 +36,7 @@ public class CoachMarksController {
     /// Implement the delegate protocol, which methods will
     /// be called at various points.
     public weak var delegate: CoachMarksControllerDelegate?
-
+    
     /// Hide the UI.
     fileprivate(set) public lazy var overlay: OverlayView = {
         let overlayView = OverlayView()
@@ -165,5 +165,21 @@ private extension CoachMarksController {
         skipViewDisplayManager.dataSource = self
 
         return skipViewDisplayManager
+    }
+}
+
+//mark: - Kepp showing some viewsOf you hierachy
+
+public extension CoachMarksController{
+
+    /// If you want to keep a certain view of you heriarchy after the CoachMarksController starts like, for example the navigationItem.titleView, you can use this keepShowingView.
+    /// This view takes two identical views:
+    /// - originalView that will be used to determine what are the constraints that should be installed on the cloneView
+    /// - cloneView an exact copy of the originalView. It will be places at the same place of the originalView but will not be covered by the overlay.
+    /// The cloneView is used to avoid breaking and restoring back constraints of the original view.
+    /// Future enhancements are to send only the originalView and the system will try to save the already installed constraints and restore them when the guide tour was completed.
+    var keepShowingView: (cloneView: UIView, originalView: UIView)?{
+        get{ return coachMarksViewController.viewToKeepShowing }
+        set{ coachMarksViewController.viewToKeepShowing = newValue }
     }
 }

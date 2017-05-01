@@ -50,7 +50,11 @@ class CoachMarksViewController: UIViewController {
             addSkipView()
         }
     }
-
+    
+    //View that can be added above all views.
+    //It can be used to add keep the app title showing.
+    var viewToKeepShowing: (cloneView: UIView, originalView: UIView)?
+    
     ///
     var currentCoachMarkView: CoachMarkView?
 
@@ -112,7 +116,24 @@ class CoachMarksViewController: UIViewController {
 
         instructionsRootView.backgroundColor = UIColor.clear
     }
-
+    
+    fileprivate func addViewToKeepShowing(){
+        if let viewToKeepShowing = viewToKeepShowing{
+            
+            viewToKeepShowing.originalView.isHidden = true
+            let convertedframe = instructionsRootView.convert(viewToKeepShowing.originalView.frame, from: viewToKeepShowing.originalView.superview)
+            instructionsRootView.addSubview(viewToKeepShowing.cloneView)
+            viewToKeepShowing.cloneView.translatesAutoresizingMaskIntoConstraints = false
+            var constraints = [NSLayoutConstraint]()
+            constraints += NSLayoutConstraint.constraints(withVisualFormat: "H:[view(vwidth)]", options: NSLayoutFormatOptions(rawValue: 0), metrics: ["vwidth": convertedframe.size.width], views: ["view": viewToKeepShowing.cloneView])
+            constraints += NSLayoutConstraint.constraints(withVisualFormat: "V:[view(vheight)]", options: NSLayoutFormatOptions(rawValue: 0), metrics: ["vheight": convertedframe.size.height], views: ["view": viewToKeepShowing.cloneView])
+            constraints += NSLayoutConstraint.constraints(withVisualFormat: "H:|-spacing-[view]", options: NSLayoutFormatOptions(rawValue: 0), metrics: ["spacing": convertedframe.origin.x], views: ["view": viewToKeepShowing.cloneView])
+            constraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|-spacing-[view]", options: NSLayoutFormatOptions(rawValue: 0), metrics: ["spacing": convertedframe.origin.y], views: ["view": viewToKeepShowing.cloneView])
+            instructionsRootView.addConstraints(constraints)
+        }
+    }
+    
+    
     /// Add a the "Skip view" to the main view container.
     fileprivate func addSkipView() {
         guard let skipView = skipView else { return }
@@ -190,8 +211,8 @@ extension CoachMarksViewController {
             completion?()
         }
     }
-
-    // MARK: - Private Methods
+    
+    //mark: Private Methods
     private func disableInteraction() {
         instructionsRootView.passthrough = false
         instructionsRootView.isUserInteractionEnabled = true
@@ -294,7 +315,9 @@ extension CoachMarksViewController {
 
         addRootView(to: window)
         addOverlayView()
-
+        
+        addViewToKeepShowing()
+        
         // If we're in the background we'll manually lay out the view.
         //
         // `instructionsRootView` is not laid out automatically in the
@@ -314,6 +337,9 @@ extension CoachMarksViewController {
     /// Detach the controller from its parent view controller.
     func detachFromParentViewController() {
         self.instructionsRootView.removeFromSuperview()
+        if let viewToKeepShowing = viewToKeepShowing{
+            viewToKeepShowing.originalView.isHidden = false
+        }
         self.willMove(toParentViewController: nil)
         self.view.removeFromSuperview()
         self.removeFromParentViewController()
