@@ -237,6 +237,16 @@ extension CoachMarksController: OverlayManagerDelegate {
     }
 }
 
+// MARK: - TitleView
+extension CoachMarksController {
+    
+    /// Pass the title view of your navigation item in case you want to show it in your overlay.
+    public var titleView: UIView? {
+        get { return coachMarksViewController.originalTitleView }
+        set { coachMarksViewController.originalTitleView = newValue }
+    }
+}
+
 // MARK: - Private builders
 private extension CoachMarksController {
     func buildCoachMarkDisplayManager() -> CoachMarkDisplayManager {

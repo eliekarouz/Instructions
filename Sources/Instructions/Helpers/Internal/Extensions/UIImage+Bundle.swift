@@ -27,4 +27,13 @@ extension UIImage {
         self.init(named: namedInInstructions, in: Bundle(for: CoachMarkView.self),
                   compatibleWith: nil)
     }
+    
+    convenience init(view: UIView) {
+        UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, 0.0)
+        
+        view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        self.init(cgImage: (image?.cgImage!)!)
+    }
 }

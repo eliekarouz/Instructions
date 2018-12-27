@@ -56,7 +56,7 @@ class CoachMarksViewController: UIViewController {
             coachMarkDisplayManager.overlayManager = overlayManager
         }
     }
-
+    
     var customStatusBarStyle: UIStatusBarStyle?
 
     var currentCoachMarkView: CoachMarkView?
@@ -88,6 +88,8 @@ class CoachMarksViewController: UIViewController {
         return view
     }()
 
+    var originalTitleView: UIView? = nil
+    
     // MARK: - Overrided properties
     ///
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -236,12 +238,14 @@ class CoachMarksViewController: UIViewController {
             self.removeFromParent()
             deregisterFromSystemEventChanges()
         }
+        originalTitleView?.isHidden = false
     }
 
     // MARK: - Private Methods
     private func addOverlayView() {
         instructionsRootView.addSubview(overlayManager.overlayView)
         overlayManager.overlayView.fillSuperview()
+        addTitleView()
     }
 
     /// Add a the "Skip view" to the main view container.
@@ -253,6 +257,26 @@ class CoachMarksViewController: UIViewController {
                                         for: .touchUpInside)
 
         instructionsRootView.addSubview(skipView.asView!)
+    }
+
+    /// Add "Title View" to the main view container after snapshoting it
+    private func addTitleView() {
+        guard let titleView = originalTitleView else { return }
+        let titleViewSnapshotImage = UIImage(view: titleView)
+        
+        let titleImageView = UIImageView(frame: .zero)
+        titleImageView.image = titleViewSnapshotImage
+        titleImageView.translatesAutoresizingMaskIntoConstraints = false
+        instructionsRootView.addSubview(titleImageView)
+
+        let frameInInstructionsRootView = instructionsRootView.convert(titleView.frame, from: titleView.superview)
+        
+        titleImageView.widthAnchor.constraint(equalToConstant: frameInInstructionsRootView.width).isActive = true
+        titleImageView.heightAnchor.constraint(equalToConstant: frameInInstructionsRootView.height).isActive = true
+        titleImageView.leftAnchor.constraint(equalTo: instructionsRootView.leftAnchor, constant: frameInInstructionsRootView.origin.x).isActive = true
+        titleImageView.topAnchor.constraint(equalTo: instructionsRootView.topAnchor, constant: frameInInstructionsRootView.origin.y).isActive = true
+        
+        titleView.isHidden = true
     }
 }
 
